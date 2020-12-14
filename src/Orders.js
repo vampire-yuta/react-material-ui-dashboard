@@ -8,33 +8,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Title from './Title';
 import axios from 'axios';
-import {useState} from "react";
-
-function getDomains(){
-    const [result, setPod] = useState({ pods: [] });
-
-    const request = axios.create({
-    baseURL: "http://127.0.0.1:1323",
-    method: "GET"
-  })
-
-  request.get("/getdomains")
-      .then(request => {
-          setPod(result)
-        console.log(result)
-      })
-}
-
-const domains = getDomains()
-
-// Generate Order Data
-function createData(id, date, name, shipTo, paymentMethod, amount) {
-  return { id, date, name, shipTo, paymentMethod, amount };
-}
-
-const rows = [
-  createData(2, '16 Mar, 2019', 'Tom Scholz', 'Boston, MA', 'MC ⠀•••• 1253', 100.81),
-];
+import {useState,useEffect} from "react";
 
 function preventDefault(event) {
   event.preventDefault();
@@ -48,6 +22,23 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Orders() {
   const classes = useStyles();
+  const [result, setPod] = useState([]);
+
+  (async()=>{
+      //非同期でデータを取得
+      const request = axios.create({
+          baseURL: "http://127.0.0.1:1323",
+          method: "GET"
+      })
+
+      const result = await request.get('/getdomains');//Pod一覧を取得
+
+      if(result.data) {
+          setPod(result.data);
+      }
+      // return () => setPod(result);
+  })();
+
   return (
     <React.Fragment>
       <Title>Recent Orders</Title>
@@ -62,7 +53,7 @@ export default function Orders() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {domains.map((domain) => (
+          {result.map((domain) => (
             <TableRow key={domain.id}>
               <TableCell>{domain.Name}</TableCell>
               <TableCell>{domain.Name}</TableCell>
