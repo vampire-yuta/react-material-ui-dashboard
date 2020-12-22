@@ -102,13 +102,11 @@ function handleClickDelete(props) {
 }
 
 function handleClickUpdateDescription(name,description) {
-    console.log("handleclick")
     console.log(name)
     console.log(description)
     const json = {"Name":name,"Description":description};
     const convert_json = JSON.stringify(json);
     const obj = JSON.parse(convert_json);
-    console.log(obj)
 
     const request = axios.create({
         baseURL: "http://127.0.0.1:1323",
@@ -127,41 +125,54 @@ function handleClickUpdateDescription(name,description) {
             console.log("error")
         })
 
-    alert(description + '\nの詳細が変更されました。')
+    alert(name + '\nの詳細が変更されました。')
 }
 
-
-
-
 export default function Orders() {
-  const classes = useStyles();
-  const [result, setPod] = useState([]);
-  const [description, setDescription] = useState()
+    const classes = useStyles();
+    const [result, setPod] = useState([]);
+    const [desc, setDesc] = useState({"Name":"","Description":""});
+    const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-      (async()=>{
-          //非同期でデータを取得
-          const request = axios.create({
-              baseURL: "http://127.0.0.1:1323",
-              method: "GET"
-          })
+    const handleClickOpen = (name,description) => {
+        setOpen(true);
+        const json = {"Name": name, "Description": description}
+        const convert_json = JSON.stringify(json);
+        const obj = JSON.parse(convert_json)
+        setDesc(obj);
+        console.log("-------")
+        console.log(obj)
+        console.log(desc)
+    };
 
-          const result = await request.get('/getdomains');//Pod一覧を取得
+    const handleClose = () => {
+        setOpen(false);
+    };
 
-          if(result.data) {
-              setPod(result.data);
-          }
-          // console.log(result.data)
-          // console.log(result.data[0].Name)
-      })();
+    useEffect(() => {
+        (async()=>{
+            //非同期でデータを取得
+            const request = axios.create({
+            baseURL: "http://127.0.0.1:1323",
+            method: "GET"
+        })
+
+        const result = await request.get('/getdomains');//Pod一覧を取得
+
+        if(result.data) {
+            setPod(result.data);
+        }
+        // console.log(result.data)
+        // console.log(result.data[0].Name)
+    })();
 
   },[]);
 
     const handleChange = event => {
-        setDescription(event.target.value);
-        console.log(description)
+        setDesc({"Name":desc.Name,"Description":event.target.value});
+        console.log(desc.Description)
+        console.log(desc.Name)
     };
-
 
     return (
     <React.Fragment>
@@ -182,26 +193,13 @@ export default function Orders() {
             <TableRow key={domain.id}>
               <TableCell>{domain.CreateDate}</TableCell>
               <TableCell>{domain.Name}</TableCell>
-              <TableCell>
-                  {/*<TextareaAutosize className={classes.container}*/}
-                  {/*    rowsMax={4}*/}
-                  {/*    aria-label="maximum height"*/}
-                  {/*    placeholder="Maximum 4 rows"*/}
-                  {/*    onChange={handleChange}*/}
-                  {/*    defaultValue={domain.Description}*/}
-                  {/*    value={description}*/}
-                  {/*/>*/}
-                  {domain.Description}
-                  {/*<Button variant="outlined" color="primary" onClick={handleClickOpen}>Open</Button>*/}
-
-                  {/*<Button className={classes.container} variant="contained" color="primary" onClick={() => { handleClickUpdateDescription(domain.SubDomainName,description)}}>保存</Button>*/}
-              </TableCell>
+              <TableCell>{domain.Description}</TableCell>
               <TableCell><Getpodstatus name={domain.SubDomainName}/></TableCell>
               <TableCell>
                   <Button variant="contained" color="primary" onClick={() => { handleClickDelete(domain.SubDomainName)}}>実行</Button>
               </TableCell>
               <TableCell>
-                  <Button variant="contained" color="primary" onClick={() => { handleClickDelete(domain.SubDomainName)}}>実行</Button>
+                  <Button variant="contained" color="primary" onClick={() => { handleClickOpen(domain.SubDomainName,domain.Description)}}>実行</Button>
               </TableCell>
             </TableRow>
           ))}
@@ -212,6 +210,33 @@ export default function Orders() {
           See more orders
         </Link>
       </div>
+      <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" >
+          <DialogTitle id="form-dialog-title">詳細</DialogTitle>
+          <DialogContent>
+              <DialogContentText>
+                  詳細を入力してください。
+              </DialogContentText>
+              <TextField
+                  id="filled-multiline-static"
+                  label="Multiline"
+                  multiline
+                  rows={4}
+                  defaultValue=""
+                  variant="filled"
+                  fullWidth
+                  value={desc.Description}
+                  onChange={handleChange}
+              />
+          </DialogContent>
+          <DialogActions>
+              <Button onClick={handleClose} color="primary">
+                  キャンセル
+              </Button>
+              <Button onClick={() => {handleClickUpdateDescription(desc.Name,desc.Description)}} color="primary">
+                  適用
+              </Button>
+          </DialogActions>
+      </Dialog>
     </React.Fragment>
   );
 }
