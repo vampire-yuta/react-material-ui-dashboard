@@ -153,7 +153,7 @@ export default function Dashboard() {
             noWrap
             className={classes.title}
           >
-            Dashboard
+            アプリケーション自動構築ツール
           </Typography>
           <IconButton color="inherit">
             <Badge badgeContent={4} color="secondary">
