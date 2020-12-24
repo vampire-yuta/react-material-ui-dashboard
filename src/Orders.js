@@ -124,8 +124,36 @@ function handleClickUpdateDescription(name,description) {
         .catch(error => {
             console.log("error")
         })
+}
 
-    alert(name + '\nの詳細が変更されました。')
+function GetBranchs() {
+    const [branches, setBranchesName] = useState({"Name":"","Branch":""});
+
+    (async()=>{
+        const request = axios.create({
+            baseURL: "http://127.0.0.1:1323",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            responseType: 'json',
+            method: "GET"
+        })
+
+        const branches = await request.get("/getbranch")
+        console.log(branches.data[0].Branch)
+        try {
+            setBranchesName({"Name":branches.data[0].Name,"Branch":branches.data[0].Branch});
+            // setDesc({"Name":desc.Name,"Description":event.target.value});
+        } catch (err) {
+            setBranchesName({"Name":"","Branch":""})
+        }
+    })();
+
+    console.log("--------")
+    console.log(branches)
+    console.log("--------")
+
+    return (<div>{branches}</div>)
 }
 
 export default function Orders() {
@@ -140,9 +168,6 @@ export default function Orders() {
         const convert_json = JSON.stringify(json);
         const obj = JSON.parse(convert_json)
         setDesc(obj);
-        console.log("-------")
-        console.log(obj)
-        console.log(desc)
     };
 
     const handleClose = () => {
@@ -184,6 +209,7 @@ export default function Orders() {
             <TableCell>URL</TableCell>
             <TableCell>説明</TableCell>
             <TableCell>状態</TableCell>
+            <TableCell>詳細</TableCell>
             <TableCell>削除</TableCell>
             <TableCell>詳細編集</TableCell>
           </TableRow>
@@ -195,6 +221,7 @@ export default function Orders() {
               <TableCell>{domain.Name}</TableCell>
               <TableCell>{domain.Description}</TableCell>
               <TableCell><Getpodstatus name={domain.SubDomainName}/></TableCell>
+              <TableCell><GetBranchs/></TableCell>
               <TableCell>
                   <Button variant="contained" color="primary" onClick={() => { handleClickDelete(domain.SubDomainName)}}>実行</Button>
               </TableCell>
@@ -211,10 +238,10 @@ export default function Orders() {
         </Link>
       </div>
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" >
-          <DialogTitle id="form-dialog-title">詳細</DialogTitle>
+          <DialogTitle id="form-dialog-title">説明</DialogTitle>
           <DialogContent>
               <DialogContentText>
-                  詳細を入力してください。
+                  説明を入力してください。
               </DialogContentText>
               <TextField
                   id="filled-multiline-static"
@@ -232,7 +259,7 @@ export default function Orders() {
               <Button onClick={handleClose} color="primary">
                   キャンセル
               </Button>
-              <Button onClick={() => {handleClickUpdateDescription(desc.Name,desc.Description)}} color="primary">
+              <Button onClick={() => {handleClickUpdateDescription(desc.Name,desc.Description,open)}} color="primary">
                   適用
               </Button>
           </DialogActions>
