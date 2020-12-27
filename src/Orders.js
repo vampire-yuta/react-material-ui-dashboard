@@ -101,64 +101,87 @@ function handleClickDelete(props) {
     alert('https://' + props + '.amelys.jp' + '\nの削除処理が始まりました。')
 }
 
-function handleClickUpdateDescription(name,description) {
-    console.log(name)
-    console.log(description)
-    const json = {"Name":name,"Description":description};
-    const convert_json = JSON.stringify(json);
-    const obj = JSON.parse(convert_json);
+// function handleClickUpdateDescription(name,description) {
+//     console.log(name)
+//     console.log(description)
+//     const json = {"Name":name,"Description":description};
+//     const convert_json = JSON.stringify(json);
+//     const obj = JSON.parse(convert_json);
+//
+//     const request = axios.create({
+//         baseURL: "http://127.0.0.1:1323",
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         responseType: 'json',
+//         method: "POST"
+//     })
+//
+//     request.post("/updatedescription",obj)
+//         .then(request => {
+//             console.log(obj);
+//         })
+//         .catch(error => {
+//             console.log("error")
+//         })
+// }
 
-    const request = axios.create({
-        baseURL: "http://127.0.0.1:1323",
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        responseType: 'json',
-        method: "POST"
-    })
+function GetBranch() {
+    // const [branches, setBranchesName] = useState({Name:"",Branch:""});
+    const defaultList = [
+        { Name: "A" ,Branch: "branch1"},
+        { Name: "B" ,Branch: "branch2"},
+        { Name: "C" ,Branch: "branch3"}
+    ]
+    const [branches, setBranchesName] = useState(defaultList);
 
-    request.post("/updatedescription",obj)
-        .then(request => {
-            console.log(obj);
-        })
-        .catch(error => {
-            console.log("error")
-        })
-}
+    useEffect( () => {
+        (async()=>{
+            const request = axios.create({
+                baseURL: "http://127.0.0.1:1323",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                responseType: 'json',
+                method: "GET"
+            })
 
-function GetBranchs() {
-    const [branches, setBranchesName] = useState({"Name":"","Branch":""});
-
-    (async()=>{
-        const request = axios.create({
-            baseURL: "http://127.0.0.1:1323",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            responseType: 'json',
-            method: "GET"
-        })
-
-        const branches = await request.get("/getbranch")
-        console.log(branches.data[0].Branch)
-        try {
-            setBranchesName({"Name":branches.data[0].Name,"Branch":branches.data[0].Branch});
-            // setDesc({"Name":desc.Name,"Description":event.target.value});
-        } catch (err) {
-            setBranchesName({"Name":"","Branch":""})
-        }
-    })();
+            const branches = await request.get("/getbranch");
+            console.log(branches.data[0].Name)
+            console.log(branches.data[0].Branch)
+            console.log(branches.data)
+            console.log(branches.data[0].Name)
+            try {
+                setBranchesName(branches.data);
+            } catch (err) {
+                setBranchesName("---")
+            }
+        })();
+},[]
+    )
 
     console.log("--------")
     console.log(branches)
+    console.log(branches[0])
     console.log("--------")
 
-    return (<div>{branches}</div>)
+    return (
+        <div>
+        {branches.map(b => (
+            <div>
+                {b.Name}
+                {b.Branch}
+            </div>
+    ))}
+        </div>
+        // <div>{branches[0].Branch}</div>
+    )
 }
 
 export default function Orders() {
     const classes = useStyles();
     const [result, setPod] = useState([]);
+    const [isrefresh, setIsrefresh] = useState(false);
     const [desc, setDesc] = useState({"Name":"","Description":""});
     const [open, setOpen] = useState(false);
 
@@ -184,20 +207,72 @@ export default function Orders() {
 
         const result = await request.get('/getdomains');//Pod一覧を取得
 
+            console.log("===========")
+            console.log(result.data)
         if(result.data) {
             setPod(result.data);
         }
-        // console.log(result.data)
-        // console.log(result.data[0].Name)
+        console.log(result.data)
     })();
 
   },[]);
+
+    useEffect(() => {
+        if (isrefresh) {
+            (async()=>{
+                //非同期でデータを取得
+                const request = axios.create({
+                    baseURL: "http://127.0.0.1:1323",
+                    method: "GET"
+                })
+
+                const result = await request.get('/getdomains');//Pod一覧を取得
+
+                console.log("===========")
+                console.log(result.data)
+                if(result.data) {
+                    setPod(result.data);
+                    setIsrefresh(false)
+                }
+
+                console.log(result.data)
+            })();
+        }
+
+    },[isrefresh]);
 
     const handleChange = event => {
         setDesc({"Name":desc.Name,"Description":event.target.value});
         console.log(desc.Description)
         console.log(desc.Name)
     };
+
+    const handleClickUpdateDescription = (name,description) => {
+        console.log(name)
+        console.log(description)
+        const json = {"Name": name, "Description": description};
+        const convert_json = JSON.stringify(json);
+        const obj = JSON.parse(convert_json);
+
+        const request = axios.create({
+            baseURL: "http://127.0.0.1:1323",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            responseType: 'json',
+            method: "POST"
+        })
+
+        request.post("/updatedescription", obj)
+            .then(request => {
+                console.log(obj);
+                setIsrefresh(true)
+                handleClose()
+            })
+            .catch(error => {
+                console.log("error")
+            })
+    }
 
     return (
     <React.Fragment>
@@ -221,7 +296,7 @@ export default function Orders() {
               <TableCell>{domain.Name}</TableCell>
               <TableCell>{domain.Description}</TableCell>
               <TableCell><Getpodstatus name={domain.SubDomainName}/></TableCell>
-              <TableCell><GetBranchs/></TableCell>
+              <TableCell><GetBranch/></TableCell>
               <TableCell>
                   <Button variant="contained" color="primary" onClick={() => { handleClickDelete(domain.SubDomainName)}}>実行</Button>
               </TableCell>
