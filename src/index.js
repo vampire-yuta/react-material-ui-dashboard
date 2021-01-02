@@ -6,12 +6,12 @@ import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Link, Router } from 'react-router-dom';
 
 ReactDOM.render(
-  // <React.StrictMode>
-  //   <Dashboard />
-  // </React.StrictMode>,
-    <Router>
-        <Router path="/" component={Dashboard} />
-    </Router>,
+  <React.StrictMode>
+    <Dashboard />
+  </React.StrictMode>,
+  //   <Router>
+  //       <Router path="/" component={Dashboard} />
+  //   </Router>,
   document.getElementById('root')
 );
 

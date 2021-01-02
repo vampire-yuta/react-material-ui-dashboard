@@ -12,22 +12,22 @@ import Dashboard from './Dashboard';
 
 export const mainListItems = (
     <BrowserRouter>
-        <Link to="/">
+        {/*<Link to="/">*/}
             <ListItem button>
                 <ListItemIcon>
                     <DashboardIcon />
                 </ListItemIcon>
                 <ListItemText primary="Dashboard" />
             </ListItem>
-        </Link>
-        <Link to="/debug">
+        {/*</Link>*/}
+        {/*<Link to="/debug">*/}
             <ListItem button>
                 <ListItemIcon>
                     <BugReportIcon />
                 </ListItemIcon>
                 <ListItemText primary="Debug" />
             </ListItem>
-        </Link>
+        {/*</Link>*/}
         <ListItem button>
             <ListItemIcon>
                 <SettingsIcon />
