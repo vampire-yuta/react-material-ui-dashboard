@@ -3,11 +3,15 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import Dashboard from './Dashboard';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter, Link, Router } from 'react-router-dom';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Dashboard />
-  </React.StrictMode>,
+  // <React.StrictMode>
+  //   <Dashboard />
+  // </React.StrictMode>,
+    <Router>
+        <Router path="/" component={Dashboard} />
+    </Router>,
   document.getElementById('root')
 );
 
