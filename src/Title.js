@@ -1,6 +1,7 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import Typography from '@material-ui/core/Typography';
+import * as React from "react";
+import PropTypes from "prop-types";
+import Typography from "@material-ui/core/Typography";
+import { withRouter } from "react-router-dom";
 
 function Title(props) {
   return (
@@ -14,4 +15,4 @@ Title.propTypes = {
   children: PropTypes.node,
 };
 
-export default Title;
+export default withRouter(Title);

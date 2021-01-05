@@ -131,7 +131,8 @@ function GetBranch() {
     <div>
       {branches.map((b) => (
         <div>
-          <strong>{b.Name}:</strong>{b.Branch}
+          <strong>{b.Name}:</strong>
+          {b.Branch}
         </div>
       ))}
     </div>
@@ -249,18 +250,18 @@ export default function Orders() {
     });
 
     request
-        .post("/delete", obj)
-        .then((request) => {
-          console.log(obj);
-          setIsrefresh(true);
-          handleClose();
-        })
-        .catch((error) => {
-          console.log("error");
-        });
+      .post("/delete", obj)
+      .then((request) => {
+        console.log(obj);
+        setIsrefresh(true);
+        handleClose();
+      })
+      .catch((error) => {
+        console.log("error");
+      });
 
     alert("https://" + props + ".amelys.jp\nの削除処理が始まりました。");
-  }
+  };
 
   return (
     <React.Fragment>
